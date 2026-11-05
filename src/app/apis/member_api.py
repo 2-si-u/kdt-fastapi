@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query, Depends
 from app.services.member_service import get_member_service, MemberService
 from app.enums.member_enum import MemberProvider
-from app.schemas.member_schema import MemberCreateDTO, MemberClaimDTO, MemberUpdateDTO
+from app.schemas.member_schema import MemberCreateDTO, MemberClaimDTO, MemberUpdateDTO, MemberSummaryDTO
 from app.schemas.common_schema import ApiResponseDTO
 
 router = APIRouter()

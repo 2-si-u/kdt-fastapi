@@ -20,7 +20,7 @@ class Post(Base):
     id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
     post_title: Mapped[str] = mapped_column(Text, nullable=False)
     post_content: Mapped[str] = mapped_column(Text, nullable=False)
-    post_read_count: Mapped[int] = mapped_column(BigInteger)
+    post_read_count: Mapped[int] = mapped_column(BigInteger, default=0)
     post_updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), 
         default=lambda: datetime.now(KST)

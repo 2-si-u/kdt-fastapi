@@ -19,7 +19,7 @@ class MemberService:
 
     # 회원 이메일 중복확인
     async def check_duplicate_member(self, member_email: str, member_provider: str) -> None:
-        result = await self.repo.exists_member(member_email, member_provider)
+        result = await self.repo.exists_member_email_and_provider(member_email, member_provider)
 
         if result:
             raise HTTPException(
@@ -43,7 +43,7 @@ class MemberService:
 
         return await self.repo.create_member(new_member)
 
-    # 회원 조회(id)
+    # 회원 (id)
     async def get_member_by_id(self, id: int):
         found_member = await self.repo.find_member_by_id(id)
 

@@ -7,7 +7,7 @@ from app.models.member_model import Member
 from app.schemas.member_schema import (
     MemberCreateDTO, MemberClaimDTO, MemberUpdateDTO
 )
-from sqlalchemy import insert, select, update, delete, func
+from sqlalchemy import insert, select, update, delete, func, exists
 
 
 class MemberRepository:
@@ -16,15 +16,16 @@ class MemberRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
+
     # 순수 함수
     # 1. 이메일 중복확인
-    async def exists_member_by_id(self, id: int):
+    async def exists_member_by_id(self, id: int) -> bool:
         query = (
-            select(Member).where(Member.id == id)
-            )
-        
+            select(exists().where(Member.id == id))
+        )
         result = await self.db.execute(query)
         return result.scalar()
+
 
     async def exists_member_email_and_provider(self, member_email: str, member_provider: str) -> bool:
         query = select(Member).where(
@@ -99,51 +100,59 @@ class MemberRepository:
         members = result.scalars().all()
         return members
 
-    # 6-1 회원 전체 조회(실무)
-    # offset - limt
-    # page - perage
-    async def find_member_by_paging(self, offset:int, limt: int) -> list[Member]:
+    # 6-1 회원 전체 조회 + 페이지네이션
+    # offset - limit
+    # page - perpage
+    async def find_member_by_paging(self, offset: int, limit: int) -> list[Member]:
         query = (
             select(Member)
             .offset(offset)
-            .limit(limt)
+            .limit(limit)
         )
 
-        result = await self. db.execute(query)
+        result = await self.db.execute(query)
         members = result.scalars().all()
         return members
 
-async def count_members(self) -> int:
-    query = (
-        select(func.count()).select_from(Member)
-    )
-    result = await self.db.excute(query)
-    membeers = result.scalars().all()
-    return membeers
 
-
+    async def count_members(self) -> int:
+        query = (
+            select(func.count()).select_from(Member)
+        )
+        result = await self.db.execute(query)
+        count = result.scalar_one()
+        return count
 
     # 7. 회원 정보 수정
-async def update_member(self, id: int, member: MemberUpdateDTO):
-    # 업데이트시 None 제외
-    # DTO -> dict
-    update_date = member.model_dump(exclude_unset=True)
+    async def update_member(self, id: int, update_data: dict) -> Member | None:
+        if not update_data:
+            return None
 
-    query = (
-        update(Member)
-        .where(Member.id == id)
-        .values(**update_date)
-        .returning(Member)
-    )
+        query = (
+            update(Member)
+            .where(Member.id == id)
+            .values(**update_data)
+            .returning(Member)
+        )
 
-    result = await self.db.execute(query)
-    await self.db.commit()
+        result = await self.db.execute(query)
+        await self.db.commit()
 
-    update_member = result.scalar_one_or_none()
-    return self.db.commit()
+        updated_member = result.scalar_one_or_none()
+        return updated_member
 
-        
+
     # 8. 회원 삭제
+    async def delete_member(self, id: int) -> bool:
+        query = (
+            delete(Member)
+                .where(Member.id == id)
+        )
+        result = await self.db.execute(query)
+        await self.db.commit()
+        return result.rowcount > 0
+
+
 
 
 # 주입 팩토리 메서드

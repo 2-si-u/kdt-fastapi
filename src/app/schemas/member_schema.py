@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 from app.enums.member_enum import MemberProvider
+from app.models.post_model import Post
 
 # VO
 class MemberVO(BaseModel):
@@ -71,3 +72,14 @@ class MemberUpdateDTO(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class MemberSummaryDTO(BaseModel):
+    id: NotImplementedError
+    member_email: str | None = None
+    member_name: str | None = None
+    member_profile: str | None = "/member/default.jpg"
+
+    class Config:
+        from_attributes = True
+

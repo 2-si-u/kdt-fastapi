@@ -29,6 +29,11 @@ async def get_postgresql_db():
         try:
             yield db
 
+        except Exception:
+            db.rollback()
+            raise
+
+
         finally:
             await db.close()
 
