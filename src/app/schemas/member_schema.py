@@ -75,11 +75,13 @@ class MemberUpdateDTO(BaseModel):
 
 
 class MemberSummaryDTO(BaseModel):
-    id: NotImplementedError
+    id: int
     member_email: str | None = None
     member_name: str | None = None
     member_profile: str | None = "/member/default.jpg"
 
     class Config:
         from_attributes = True
+
+
 
